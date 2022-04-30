@@ -20,6 +20,24 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 
 	context.subscriptions.push(disposable);
+
+    let showFileStatCmd = vscode.commands.registerCommand('showFileStatCmd', (uri: vscode.Uri) => {
+		console.log('--- showFileStatCmd ---');
+		console.log(uri.fsPath);
+		const fileStat = vscode.workspace.fs.stat(uri);
+		fileStat.then((fileStatVal) => {
+			let infoStr = 'create time : ' + new Date(fileStatVal.ctime).toLocaleDateString() +
+				'\nmodify time : ' + new Date(fileStatVal.mtime).toLocaleDateString() +
+				'\nsize : ' + fileStatVal.size;
+			vscode.window.showInformationMessage(infoStr);
+			console.log(infoStr);
+		}, () => {
+			console.log('fail');
+		});
+	});
+
+    // 注册到监听队列中
+    context.subscriptions.push(showFileStatCmd);
 }
 
 // this method is called when your extension is deactivated

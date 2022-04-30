@@ -3,6 +3,7 @@
 	"displayName": "file-helper",
 	"description": "",
 	"version": "0.0.1",
+    "publisher": "zuksan",
 	"engines": {
 		"vscode": "^1.66.0"
 	},
@@ -10,16 +11,28 @@
 		"Other"
 	],
 	"activationEvents": [
-        "onCommand:file-helper.helloWorld"
+        "*"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
 		"commands": [
 			{
 				"command": "file-helper.helloWorld",
-				"title": "Hello World"
-			}
-		]
+				"title": "[file helper] Hello World"
+			},
+			{
+                "command": "showFileStatCmd",
+                "title": "[file helper] show stat"
+            }
+		],
+		"menus": {
+			"explorer/context": [
+				{
+					"command": "showFileStatCmd",
+					"group": "navigation"
+				}
+			]
+		}
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run compile",
