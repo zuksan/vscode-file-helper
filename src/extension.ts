@@ -2,6 +2,33 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 
+namespace Tools {
+	export const KB = 1024;
+	export const MB = KB * 1024;
+	export const GB = MB * 1024;
+	export const TB = GB * 1024;
+	export const fileSizeScale : any = [
+		[TB, 'TB'],
+		[GB, 'GB'],
+		[MB, 'MB'],
+		[KB, 'KB'],
+	];
+};
+
+function toHumanReadableFileSize(byteSize : number) : string {
+	for (let i = 0; i < Tools.fileSizeScale.length; i++) {
+		let base : number = Tools.fileSizeScale[i][0];
+		if (byteSize < base) {
+			continue;
+		}
+		let res : string = (byteSize / base).toFixed(2) + ' ' + Tools.fileSizeScale[i][1] +
+			' (' + byteSize + ' B)';
+		return res;
+	}
+
+	return byteSize + ' B';
+}
+
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
@@ -25,13 +52,28 @@ export function activate(context: vscode.ExtensionContext) {
 		console.log('--- showFileStatCmd ---');
 		console.log(uri.fsPath);
 		const fileStat = vscode.workspace.fs.stat(uri);
-		fileStat.then((fileStatVal) => {
-			let infoStr = 'create time : ' + new Date(fileStatVal.ctime).toLocaleDateString() +
-				'\nmodify time : ' + new Date(fileStatVal.mtime).toLocaleDateString() +
-				'\nsize : ' + fileStatVal.size;
-			vscode.window.showInformationMessage(infoStr);
-			console.log(infoStr);
+		fileStat.then((fileStatVal : vscode.FileStat) => {
+			const cDate = new Date(fileStatVal.ctime);
+			const mDate = new Date(fileStatVal.mtime);
+			let msgArr = [
+				'size: ' + toHumanReadableFileSize(fileStatVal.size),
+				'ctime: ' + cDate.toLocaleString(),
+				'mtime: ' + mDate.toLocaleString(),
+			];
+			let title = '';
+			if (fileStatVal.permissions != undefined) {
+				title += '[' + fileStatVal.permissions?.toString() + ']';
+			}
+			if (fileStatVal.type == 2) { // directory
+				title += 'dir';
+			} else {
+				title += 'file' + msgArr[0];
+			}
+			let options = { detail: msgArr.join('\n'), modal: false};
+			vscode.window.showInformationMessage<string>(title, options, msgArr[1], msgArr[2]);
+			console.log(msgArr.join('\n'));
 		}, () => {
+			vscode.window.showInformationMessage('fail');
 			console.log('fail');
 		});
 	});
