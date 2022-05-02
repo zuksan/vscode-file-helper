@@ -3,7 +3,11 @@
 	"displayName": "file-helper",
 	"description": "",
 	"version": "0.0.1",
-    "publisher": "zuksan",
+	"publisher": "zuksanwang",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/zuksan/vscode-file-helper"
+	},
 	"engines": {
 		"vscode": "^1.66.0"
 	},
